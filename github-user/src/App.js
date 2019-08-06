@@ -1,15 +1,52 @@
 import React from "react";
-import logo from "./logo.svg";
+import axios from "axios";
 import "./App.css";
+import GitHubList from "./components/GithubList";
+import GitHubFollowers from "./components/GitHubFollowers";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1> Welcome to Github Users Card </h1>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      userInfo: "",
+      userFollowers: []
+    };
+  }
+
+  componentDidMount() {
+    axios
+      .get("https://api.github.com/users/denmercs")
+      .then(response => {
+        this.setState({
+          userInfo: response.data
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    axios
+      .get("https://api.github.com/users/denmercs/followers")
+      .then(response => {
+        this.setState({
+          userFollowers: response.data
+        });
+      });
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h1> Welcome to Github Users Card </h1>
+          <GitHubList user={this.state.userInfo} />
+          {this.state.userFollowers.map(users => {
+            return <GitHubFollowers followers={users} />;
+          })}
+        </header>
+      </div>
+    );
+  }
 }
 
 export default App;
